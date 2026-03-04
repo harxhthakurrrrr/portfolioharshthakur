@@ -1,62 +1,76 @@
-# Portofolio Web — [Faris Edrik P / rissss21]
+# 🌐 Portfolio Web — Harsh Thakur
 
-Selamat datang di portofolio web pribadi saya! 🌐  
-Dibuat dengan React + Vite, ini adalah showcase dari project, skill, dan karya yang ingin saya bagikan.
+Welcome to my personal **Portfolio Website**!
+Built using **React + Vite**, this project showcases my **skills, projects, and development work**.
 
-##  Struktur Project
+## 📁 Project Structure
 
-- `public/` — file statis (favicon, assets, dsb.)  
-- `src/` — code utama React (komponen, utilitas, dsb.)  
-- `index.html` — entry point halaman web  
-- `package.json` & `package-lock.json` — manajemen dependencies dan script  
-- `vite.config.js` — konfigurasi build dan dev server Vite  
-- `eslint.config.js` — aturan linting agar kodenya tetap bersih dan konsisten  
+* `public/` — Static files (favicon, assets, images, etc.)
+* `src/` — Main React source code (components, utilities, etc.)
+* `index.html` — Entry point of the web application
+* `package.json` & `package-lock.json` — Dependency management and scripts
+* `vite.config.js` — Configuration for Vite build and development server
+* `eslint.config.js` — Linting rules to maintain clean and consistent code
 
-##  Fitur Utama
+## ✨ Main Features
 
-- Dibangun dengan **React + Vite** — ringan, cepat reload, dan performa build optimal  
-- **ESLint** telah terkonfigurasi agar coding style tetap rapi  
-- Struktur modular dan siap dikembangkan—bisa ditambahkan halaman “About”, “Projects”, dsb.
+* Built with **React + Vite** for fast development and optimized performance
+* **Hot Module Reloading** for quick updates during development
+* **ESLint configured** to maintain code quality
+* Modular project structure — easy to add pages like **About, Projects, Contact**
 
-##  Cara Jalankan
+## 🚀 How to Run the Project
 
-1. Clone repository ini:
+1. Clone this repository:
+
 ```bash
-git clone https://github.com/rissss21/portofolio.git
-cd portofolio
-````
+git clone https://github.com/harxhthakurrrrr/portfolioharshthakur.git
+cd portfolioharshthakur
+```
 
 2. Install dependencies:
+
 ```bash
 npm install
-````
+```
 
-3. Jalankan server lokal dengan hot reload:
+3. Run the local development server:
+
 ```bash
 npm run dev
-````
+```
 
-4. Buat versi production:
+4. Build the production version:
+
 ```bash
 npm run build
-````
+```
 
-## &#x20;Quick Preview
+## 🔎 Quick Preview
 
-Jika sudah di-deploy (contoh: GitHub Pages, Netlify, Vercel), kamu bisa tambahkan link deploy di sini, misalnya:
-[🔗 Lihat versi live](https://username.github.io/portofolio/)
+If the project is deployed (for example on **GitHub Pages, Netlify, or Vercel**), you can add your live link here:
 
-## Tentang Saya
+🔗 https://your-portfolio-link.com
 
-Hai, saya Faris Edrik P (username GitHub: `rissss21`).
-Saya seorang Developer yang suka bikin aplikasi web ringan dengan tampilan modern dan performa tinggi. Scroll aja di project saya, dan jangan sungkan untuk reach out kalau ada pertanyaan!
+## 👨‍💻 About Me
 
-* **Email:** [email\_farisedrik21@gmail.com](mailto:email_farisedrik21@gmail.com)
-* **LinkedIn:** [linkedin.com/in/farisedp](https://www.linkedin.com/in/farisedp/)
-* **Instagram:** @farisedrikprayoga
+Hi, I'm **Harsh Thakur**, a **Frontend Developer** passionate about building modern and responsive web applications.
+
+* 🎓 **BCA Graduate**
+* 💻 Skilled in **React, JavaScript, HTML, CSS**
+* 📊 Experience with **Power BI & Data Analysis**
+* 🚀 Currently working on modern **web development projects**
+
+## 📬 Contact
+
+📧 Email: [harshthakur@example.com](mailto:harshthakur@example.com)
+
+🔗 GitHub:
+https://github.com/harxhthakurrrrr
+
+🔗 LinkedIn:
+(Add your LinkedIn profile link here)
 
 ---
 
-
-[1]: https://github.com/rissss21/portofolio "GitHub - rissss21/portofolio"
-#
+⭐ If you like this project, feel free to **star the repository**!
