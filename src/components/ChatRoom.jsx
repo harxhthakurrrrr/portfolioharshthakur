@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { auth, loginWithGoogle, logout, db } from "../firebase";
+import { auth, loginWithGoogle, logout } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase";
 import {
   collection,
   addDoc,
@@ -17,32 +18,56 @@ export default function ChatRoom() {
 
   // Cek login
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
     return () => unsub();
   }, []);
 
   // Ambil pesan real-time
   useEffect(() => {
-    const q = query(collection(db, "messages"), orderBy("createdAt"));
+    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
     const unsub = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMessages(msgs);
+    }, (error) => {
+      console.error("Error fetching messages:", error);
     });
+
     return () => unsub();
   }, []);
 
   // Kirim pesan
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || !user) return;
 
-    await addDoc(collection(db, "messages"), {
-      text: message,
-      uid: user.uid,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      createdAt: serverTimestamp()
-    });
-    setMessage("");
+    try {
+      await addDoc(collection(db, "messages"), {
+        text: message,
+        uid: user.uid,
+        displayName: user.displayName || "Anonymous",
+        photoURL: user.photoURL || null,
+        createdAt: serverTimestamp()
+      });
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  // Format timestamp
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = timestamp.toDate();
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -53,12 +78,25 @@ export default function ChatRoom() {
       {user && (
         <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
           <div className="flex items-center gap-3">
-            <img src={user.photoURL} alt="avatar" className="w-10 h-10 rounded-full" />
+            {user.photoURL ? (
+              <img 
+                src={user.photoURL} 
+                alt="avatar" 
+                className="w-10 h-10 rounded-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                <span className="text-white text-lg">
+                  {user.displayName?.charAt(0) || "U"}
+                </span>
+              </div>
+            )}
             <span className="text-white font-semibold">{user.displayName}</span>
           </div>
           <button
             onClick={logout}
-            className="bg-red-600 px-4 py-1 rounded-full text-white hover:bg-red-700"
+            className="bg-red-600 px-4 py-1 rounded-full text-white hover:bg-red-700 transition"
           >
             Logout
           </button>
@@ -66,53 +104,83 @@ export default function ChatRoom() {
       )}
 
       {/* Area pesan */}
-      <div className="h-72 overflow-y-auto border border-gray-700 p-3 rounded-lg bg-zinc-800 mb-4 space-y-3">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex gap-2 ${msg.uid === user?.uid ? "justify-end" : "justify-start"}`}
-          >
-            {msg.uid !== user?.uid && (
-              <img
-                src={msg.photoURL || "https://via.placeholder.com/40"}
-                alt="avatar"
-                className="w-8 h-8 rounded-full"
-              />
-            )}
+      <div className="h-96 overflow-y-auto border border-gray-700 p-3 rounded-lg bg-zinc-800 mb-4 space-y-3">
+        {messages.length === 0 ? (
+          <p className="text-center text-gray-400 py-8">Belum ada pesan. Mulai percakapan!</p>
+        ) : (
+          messages.map((msg) => (
             <div
-              className={`p-3 rounded-lg max-w-[75%] ${
-                msg.uid === user?.uid
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-700 text-white"
-              }`}
+              key={msg.id}
+              className={`flex gap-2 ${msg.uid === user?.uid ? "justify-end" : "justify-start"}`}
             >
-              <div className="text-xs opacity-70 mb-1">{msg.displayName}</div>
-              <div>{msg.text}</div>
+              {msg.uid !== user?.uid && (
+                msg.photoURL ? (
+                  <img
+                    src={msg.photoURL}
+                    alt={msg.displayName}
+                    className="w-8 h-8 rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-sm">
+                      {msg.displayName?.charAt(0) || "U"}
+                    </span>
+                  </div>
+                )
+              )}
+              <div
+                className={`p-3 rounded-lg max-w-[75%] ${
+                  msg.uid === user?.uid
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-700 text-white"
+                }`}
+              >
+                <div className="text-xs opacity-70 mb-1 flex items-center gap-2">
+                  <span>{msg.displayName}</span>
+                  {msg.createdAt && (
+                    <span className="text-[10px] opacity-50">
+                      {formatTime(msg.createdAt)}
+                    </span>
+                  )}
+                </div>
+                <div className="break-words">{msg.text}</div>
+              </div>
+              {msg.uid === user?.uid && (
+                msg.photoURL ? (
+                  <img
+                    src={msg.photoURL}
+                    alt={msg.displayName}
+                    className="w-8 h-8 rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-sm">
+                      {msg.displayName?.charAt(0) || "U"}
+                    </span>
+                  </div>
+                )
+              )}
             </div>
-            {msg.uid === user?.uid && (
-              <img
-                src={msg.photoURL || "https://via.placeholder.com/40"}
-                alt="avatar"
-                className="w-8 h-8 rounded-full"
-              />
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Form login / kirim pesan */}
       {user ? (
-        <form onSubmit={sendMessage} className="flex gap-2 flex-wrap sm:flex-nowrap w-full">
+        <form onSubmit={sendMessage} className="flex gap-2">
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Ketik pesan..."
-            className="flex-1 min-w-0 p-2 rounded-lg bg-zinc-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 p-2 rounded-lg bg-zinc-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="bg-green-600 px-4 py-2 rounded-lg text-white hover:bg-green-700 w-full sm:w-auto"
+            disabled={!message.trim()}
+            className="bg-green-600 px-6 py-2 rounded-lg text-white hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Send
           </button>
